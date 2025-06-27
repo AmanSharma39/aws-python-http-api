@@ -1,98 +1,127 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in Python'
-description: 'This template demonstrates how to make a simple HTTP API with Python running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: python
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# 🚀 Serverless Framework Hello API (AWS Python HTTP API)
 
-# Serverless Framework Python HTTP API on AWS
+This project demonstrates a simple `hello world` API using the **Serverless Framework** on AWS. It uses **Python** as the runtime and **HTTP API Gateway** to expose a basic endpoint. The setup is done from scratch on an **EC2 instance** (acting as a development headquarters).
 
-This template demonstrates how to make a simple HTTP API with Python running on AWS Lambda and API Gateway using the Serverless Framework.
+---
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes DynamoDB, Mongo, Fauna and other examples.
+## 🧰 Prerequisites
 
-## Usage
+Make sure you have the following set up on your EC2 instance:
 
-### Deployment
+- ✅ Node.js and npm
+- ✅ Python 3.x
+- ✅ AWS CLI
+- ✅ Serverless Framework
 
+---
+
+## ⚙️ Initial Setup
+
+### 1. Launch EC2 Instance (Headquarter)
+
+- Create and connect to a new EC2 instance (Amazon Linux 2 or Ubuntu).
+- Update packages:
+
+  ```bash
+  sudo apt update    
+  ```
+  ![Ec2](https://github.com/AmanSharma39/aws-python-http-api/blob/main/images/Screenshot%202025-06-27%20083025.png?raw=true)
+###  2. Install Node.js & npm
+Install Node.js (if not already installed):
+```bash
+sudo apt install nodejs npm  
 ```
+
+Update npm and install Serverless globally:
+```bash 
+npm install -g npm
+sudo npm install -g serverless
+```
+### 🧪 Create Hello API Project
+
+Run the following Serverless command to scaffold a new Python-based HTTP API project:
+```bash
+serverless create --template aws-python-http-api --path hello-api
+cd hello-api
+```
+Project structure:
+```bash
+hello-api/
+│
+├── handler.py         # Python Lambda function
+└── serverless.yml     # Infrastructure as Code (IaC)
+```
+* handler.py
+
+  ![handler](https://github.com/AmanSharma39/aws-python-http-api/blob/main/images/Screenshot%202025-06-27%20094650.png?raw=true)
+
+* serverless.yml
+
+  ![serverless](https://github.com/AmanSharma39/aws-python-http-api/blob/main/images/Screenshot%202025-06-27%20111714.png?raw=true)
+
+You can customize your `handler.py` to define your logic, for example:
+```bash
+import json
+
+
+def hello(event, context):
+    body = {
+        "message": "Hello jiiii",
+    }
+
+    response = {"statusCode": 200, "body": json.dumps(body)}
+
+    return response
+```
+## 🔐 Set Up AWS Credentials
+
+### 1. Create an IAM user
+* Go to AWS Console → IAM → Users → Add User
+* Programmatic access → Attach AdministratorAccess (for learning/demo)
+
+### 2. Install AWS CLI:
+
+```bash
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+ ![Alt text](https://github.com/AmanSharma39/aws-python-http-api/blob/main/images/Screenshot%202025-06-27%20091354.png?raw=true)
+
+Configure with your IAM user credentials:
+```bash
+aws configure
+```
+
+Provide:
+- AWS Access Key ID
+- AWS Secret Access Key
+- Region (e.g., `us-east-1`)
+- Output format (e.g., json)
+
+![Access key](https://github.com/AmanSharma39/aws-python-http-api/blob/main/images/Screenshot%202025-06-27%20091048.png?raw=true)
+
+![Secret key](https://github.com/AmanSharma39/aws-python-http-api/blob/main/images/Screenshot%202025-06-27%20091459.png?raw=true)
+
+## 🚀 Deploy to AWS
+From within your project directory:
+```bash
 serverless deploy
 ```
+![deploy](https://github.com/AmanSharma39/aws-python-http-api/blob/main/images/Screenshot%202025-06-27%20094335.png?raw=true)
 
-After deploying, you should see output similar to:
-
-```
-Deploying "aws-python-http-api" to stage "dev" (us-east-1)
-
-✔ Service deployed to stack aws-python-http-api-dev (85s)
-
-endpoint: GET - https://6ewcye3q4d.execute-api.us-east-1.amazonaws.com/
+You'll get an output like:
+```bash
+endpoints:
+  GET - https://xyz123.execute-api.us-east-1.amazonaws.com/
 functions:
-  hello: aws-python-http-api-dev-hello (2.3 kB)
+  hello: hello-api-dev-hello
 ```
+![deploy](https://github.com/AmanSharma39/aws-python-http-api/blob/main/images/Screenshot%202025-06-27%20094627.png?raw=true)
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [http event docs](https://www.serverless.com/framework/docs/providers/aws/events/apigateway/).
+Test it in the browser or via `curl`.
 
-### Invocation
-
-After successful deployment, you can call the created application via HTTP:
-
+## 🧹 Clean Up
+```bash
+serverless remove
 ```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
-```
-
-Which should result in response similar to the following (removed `input` content for brevity):
-
-```json
-{
-  "message": "Go Serverless v4.0! Your function executed successfully!"
-}
-```
-
-### Local development
-
-You can invoke your function locally by using the following command:
-
-```
-serverless invoke local --function hello
-```
-
-Which should result in response similar to the following:
-
-```json
-{
-  "statusCode": 200,
-  "body": "{\n  \"message\": \"Go Serverless v4.0! Your function executed successfully!\"}"
-}
-```
-
-Alternatively, it is also possible to emulate API Gateway and Lambda locally by using `serverless-offline` plugin. In order to do that, execute the following command:
-
-```
-serverless plugin install -n serverless-offline
-```
-
-It will add the `serverless-offline` plugin to `devDependencies` in `package.json` file as well as will add it to `plugins` in `serverless.yml`.
-
-After installation, you can start local emulation with:
-
-```
-serverless offline
-```
-
-To learn more about the capabilities of `serverless-offline`, please refer to its [GitHub repository](https://github.com/dherault/serverless-offline).
-
-### Bundling dependencies
-
-In case you would like to include 3rd party dependencies, you will need to use a plugin called `serverless-python-requirements`. You can set it up by running the following command:
-
-```
-serverless plugin install -n serverless-python-requirements
-```
-
-Running the above will automatically add `serverless-python-requirements` to `plugins` section in your `serverless.yml` file and add it as a `devDependency` to `package.json` file. The `package.json` file will be automatically created if it doesn't exist beforehand. Now you will be able to add your dependencies to `requirements.txt` file (`Pipfile` and `pyproject.toml` is also supported but requires additional configuration) and they will be automatically injected to Lambda package during build process. For more details about the plugin's configuration, please refer to [official documentation](https://github.com/UnitedIncome/serverless-python-requirements).
